@@ -1,7 +1,12 @@
 const icon = (name, label = '') => `<i class="bi bi-${name}" aria-hidden="true"></i>${label ? `<span class="visually-hidden">${label}</span>` : ''}`;
 
-export function renderHotelCard({ name = 'Hotel name placeholder', location = 'Location placeholder', price = 'Price placeholder', imageLabel = 'Hotel image placeholder' } = {}) {
-  return `<article class="hotel-card"><div class="hotel-card__media" role="img" aria-label="${imageLabel}">${icon('image', imageLabel)}</div><div class="hotel-card__body"><span class="badge badge-soft mb-3">Placeholder listing</span><h3 class="hotel-card__title h5">${name}</h3><p class="text-secondary mb-3">${location}</p><p class="price mb-3">${price}</p><button class="btn btn-outline-secondary" type="button" disabled>Details unavailable</button></div></article>`;
+export function renderHotelCard({ id = '', name = 'Hotel', location = '', room_types = [], image = null, search = {} } = {}) {
+  const escape = (value = '') => String(value).replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
+  const activeRates = room_types.filter((room) => room.is_active !== false && room.nightly_rate !== null).map((room) => Number(room.nightly_rate)).filter(Number.isFinite);
+  const price = activeRates.length ? `From €${Math.min(...activeRates).toFixed(2)} / night` : 'Pricing shown after selecting a room';
+  const params = new URLSearchParams({ hotel_id: id, ...Object.fromEntries(Object.entries(search).filter(([, value]) => value)) });
+  const media = image ? `<img src="${escape(image.url)}" alt="${escape(image.alt)}" loading="lazy">` : `<div class="hotel-card__fallback" role="img" aria-label="${escape(name)} image unavailable"><i class="bi bi-image" aria-hidden="true"></i><span>Image coming soon</span></div>`;
+  return `<article class="hotel-card"><div class="hotel-card__media">${media}</div><div class="hotel-card__body"><span class="badge badge-soft mb-3">Active property</span><h3 class="hotel-card__title h5">${escape(name)}</h3><p class="text-secondary mb-3"><i class="bi bi-geo-alt me-1" aria-hidden="true"></i>${escape(location)}</p><p class="price mb-3"><span class="small fw-normal text-secondary">${activeRates.length ? 'Indicative ' : ''}</span>${escape(price)}</p><a class="btn btn-outline-primary" href="/hotel/?${params.toString()}">View hotel details</a></div></article>`;
 }
 
 export function renderLoadingSkeleton(count = 3) {

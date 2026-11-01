@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build --configLoader runner",
-    "preview": "vite preview --configLoader runner"
+    "preview": "vite preview --configLoader runner",
+    "seed:demo": "node scripts/seed-demo.mjs"
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
