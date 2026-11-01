@@ -1,0 +1,19 @@
+{
+  "name": "hotel-booking-system",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --configLoader runner",
+    "preview": "vite preview --configLoader runner"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "@supabase/supabase-js": "^2.76.1",
+    "bootstrap": "^5.3.8"
+  },
+  "devDependencies": {
+    "vite": "^7.1.12"
+  }
+}
