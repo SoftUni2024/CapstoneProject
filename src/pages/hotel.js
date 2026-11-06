@@ -36,7 +36,7 @@ function searchForm(search) {
 }
 
 function imageMarkup(image, hotelName, className = '') {
-  if (image?.storage_path && /^https?:\/\//i.test(image.storage_path)) return `<img class="${className}" src="${escape(image.storage_path)}" alt="${escape(image.alt_text || `${hotelName} image`)}" loading="lazy">`;
+  if (image?.storage_path) { const url = /^https?:\/\//i.test(image.storage_path) ? image.storage_path : supabaseClient.storage.from('hotel-images').getPublicUrl(image.storage_path).data.publicUrl; return `<img class="${className}" src="${escape(url)}" alt="${escape(image.alt_text || `${hotelName} image`)}" loading="lazy">`; }
   return `<div class="hotel-card__fallback detail-image-fallback" role="img" aria-label="${escape(hotelName)} image unavailable"><i class="bi bi-image" aria-hidden="true"></i><span>Image coming soon</span></div>`;
 }
 

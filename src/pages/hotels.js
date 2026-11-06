@@ -51,7 +51,8 @@ function contextParams(search, extra = {}) {
 }
 
 function card({ hotel, roomTypes = [], search, indicativeRate, coverPath, coverAlt, dateMode }) {
-  const image = coverPath && /^https?:\/\//i.test(coverPath) ? `<img src="${escape(coverPath)}" alt="${escape(coverAlt || `${hotel.name} cover`)}" loading="lazy">` : `<div class="hotel-card__fallback" role="img" aria-label="${escape(hotel.name)} image unavailable"><i class="bi bi-image" aria-hidden="true"></i><span>Image coming soon</span></div>`;
+  const coverUrl = coverPath ? (/^https?:\/\//i.test(coverPath) ? coverPath : supabaseClient.storage.from('hotel-images').getPublicUrl(coverPath).data.publicUrl) : null;
+  const image = coverUrl ? `<img src="${escape(coverUrl)}" alt="${escape(coverAlt || `${hotel.name} cover`)}" loading="lazy">` : `<div class="hotel-card__fallback" role="img" aria-label="${escape(hotel.name)} image unavailable"><i class="bi bi-image" aria-hidden="true"></i><span>Image coming soon</span></div>`;
   const summaries = roomTypes.map((room) => `<li><span>${escape(room.room_type_name || room.name)}</span><span>${dateMode ? `${room.available_rooms} available` : `up to ${room.capacity} guests`}</span></li>`).join('');
   const rate = indicativeRate ?? roomTypes.reduce((min, room) => Math.min(min, Number(room.nightly_rate)), Number.POSITIVE_INFINITY);
   const price = Number.isFinite(rate) ? `From €${rate.toFixed(2)} / night` : 'Pricing shown after selecting a room';

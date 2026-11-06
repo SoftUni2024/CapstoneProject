@@ -69,8 +69,9 @@ function attachSearch() {
 function getCoverImage(hotel) {
   const images = hotel.hotel_images || [];
   const image = images.filter((item) => item.is_cover).sort((a, b) => a.position - b.position)[0] || images.sort((a, b) => a.position - b.position)[0];
-  if (!image?.storage_path || !/^https?:\/\//i.test(image.storage_path)) return null;
-  return { url: image.storage_path, alt: image.alt_text || `${hotel.name} cover` };
+  if (!image?.storage_path) return null;
+  const url = /^https?:\/\//i.test(image.storage_path) ? image.storage_path : supabaseClient.storage.from('hotel-images').getPublicUrl(image.storage_path).data.publicUrl;
+  return { url, alt: image.alt_text || `${hotel.name} cover` };
 }
 
 function currentSearch() {
