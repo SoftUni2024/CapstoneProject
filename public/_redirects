@@ -1,0 +1,14 @@
+/hotels/*                /pages/hotels/index.html                 200
+/hotel/*                 /pages/hotel/index.html                  200
+/login/*                 /pages/login/index.html                  200
+/register/*              /pages/register/index.html               200
+/booking/*               /pages/booking/index.html                200
+/booking-confirmation/*  /pages/booking-confirmation/index.html   200
+/my-bookings/*           /pages/my-bookings/index.html            200
+/booking-details/*       /pages/booking-details/index.html        200
+/account/*               /pages/account/index.html                200
+/admin/hotels/*          /pages/admin/hotels/index.html           200
+/admin/hotel-edit/*      /pages/admin/hotel-edit/index.html       200
+/admin/rooms/*           /pages/admin/rooms/index.html            200
+/admin/bookings/*        /pages/admin/bookings/index.html         200
+/admin/*                 /pages/admin/index.html                  200
