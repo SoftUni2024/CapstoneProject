@@ -1,0 +1,6 @@
+services:
+  - type: web
+    runtime: static
+    name: hotel-booking-system
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
