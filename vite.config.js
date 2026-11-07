@@ -1,5 +1,25 @@
+import { cp } from 'node:fs/promises';
 import { defineConfig } from 'vite';
+
+const pageDirectories = [
+  'hotel', 'hotels', 'login', 'register', 'booking', 'booking-confirmation',
+  'my-bookings', 'booking-details', 'account', 'admin',
+];
+
+function publishPageDirectories() {
+  return {
+    name: 'publish-page-directories',
+    apply: 'build',
+    async closeBundle() {
+      for (const directory of pageDirectories) {
+        await cp(`dist/pages/${directory}`, `dist/${directory}`, { recursive: true, force: true });
+      }
+    },
+  };
+}
+
 export default defineConfig({
+  plugins: [publishPageDirectories()],
   root: '.',
   build: {
     rollupOptions: {
