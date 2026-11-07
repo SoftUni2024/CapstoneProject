@@ -1,8 +1,10 @@
+import { supabaseClient } from '../services/supabase-client.js';
+
 export function getQueryParams() { return new URLSearchParams(window.location.search); }
 
 export function renderNavigation({ active = '' } = {}) {
   const links = [['Home', '/'], ['Hotels', '/hotels/'], ['Log in', '/login/'], ['Register', '/register/']];
-  return `<header class="app-header"><nav class="navbar navbar-expand-lg" aria-label="Primary navigation"><div class="page-container container-fluid"><a class="navbar-brand" href="/">StayEasy<span class="visually-hidden"> home</span></a><button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button><div class="collapse navbar-collapse" id="main-nav"><ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">${links.map(([label, href]) => `<li class="nav-item"><a class="nav-link${active === label ? ' active' : ''}" href="${href}">${label}</a></li>`).join('')}<li class="nav-item dropdown"><button class="nav-link btn btn-link dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Account</button><ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" href="/my-bookings/">My bookings</a></li><li><a class="dropdown-item" href="/account/">Account</a></li><li><button class="dropdown-item" type="button" disabled>Logout (not connected)</button></li></ul></li></ul></div></div></nav></header>`;
+  return `<header class="app-header"><nav class="navbar navbar-expand-lg" aria-label="Primary navigation"><div class="page-container container-fluid"><a class="navbar-brand" href="/">StayEasy<span class="visually-hidden"> home</span></a><button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button><div class="collapse navbar-collapse" id="main-nav"><ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">${links.map(([label, href]) => `<li class="nav-item"><a class="nav-link${active === label ? ' active' : ''}" href="${href}">${label}</a></li>`).join('')}<li class="nav-item dropdown"><button class="nav-link btn btn-link dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Account</button><ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" href="/my-bookings/">My bookings</a></li><li><a class="dropdown-item" href="/account/">Account</a></li><li><button class="dropdown-item" type="button" data-auth-logout>Log out</button></li></ul></li></ul></div></div></nav></header>`;
 }
 
 export function renderFooter() { return `<footer class="site-footer py-4"><div class="page-container d-flex flex-column flex-md-row justify-content-between gap-3"><span class="small text-secondary">StayEasy · Placeholder interface · No live data</span><div class="d-flex gap-3"><a class="footer-link small" href="/">Home</a><a class="footer-link small" href="/hotels/">Hotels</a></div></div></footer>`; }
@@ -11,3 +13,22 @@ export function mountPage({ title, heading, description, active }) {
   document.title = `${title} | StayEasy`;
   document.querySelector('#app').innerHTML = `${renderNavigation({ active })}<main class="page-container page-shell section"><div class="placeholder-card mx-auto p-4 p-md-5"><p class="text-uppercase text-secondary small fw-semibold mb-2">Placeholder content · Hotel Booking System</p><h1 class="display-6">${heading}</h1><p class="lead mb-4">${description}</p><p class="small text-secondary mb-3">This is a visual placeholder. No live listings, reviews, ratings, reservations, or account actions are connected yet.</p><button class="btn btn-outline-secondary" type="button" disabled>Placeholder action — not available</button></div></main>${renderFooter()}`;
 }
+
+// Navigation is inserted dynamically by each page; delegate logout clicks from document.
+document.addEventListener('click', async (event) => {
+  const button = event.target.closest('[data-auth-logout]');
+  if (!button || button.disabled) return;
+  button.disabled = true;
+  const originalLabel = button.textContent;
+  button.textContent = 'Logging out…';
+  try {
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) throw error;
+    window.location.assign('/login/');
+  } catch (error) {
+    console.error('Unable to sign out:', error);
+    button.textContent = originalLabel;
+    button.disabled = false;
+    window.alert('Could not log out. Please try again.');
+  }
+});
