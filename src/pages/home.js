@@ -74,6 +74,56 @@ function getCoverImage(hotel) {
   return { url, alt: image.alt_text || `${hotel.name} cover` };
 }
 
+function escapeHtml(value = '') {
+  return String(value).replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
+}
+
+function renderDestinations(hotels) {
+  const container = document.querySelector('#featured-destinations');
+  const grouped = new Map();
+  for (const hotel of hotels) {
+    const city = String(hotel.city || '').trim();
+    if (!city) continue;
+    const key = city.toLocaleLowerCase();
+    const item = grouped.get(key) || { city, country: hotel.country || '', count: 0, image: null };
+    item.count += 1;
+    if (!item.image) item.image = getCoverImage(hotel);
+    grouped.set(key, item);
+  }
+  const destinations = [...grouped.values()].slice(0, 6);
+  if (!destinations.length) {
+    container.innerHTML = '<p class="text-secondary">Destinations will appear as hotels are published.</p>';
+    return;
+  }
+  container.innerHTML = destinations.map((destination, index) => {
+    const image = destination.image
+      ? `<img src="${escapeHtml(destination.image.url)}" alt="" loading="lazy">`
+      : '<span class="destination-card__fallback" aria-hidden="true"><i class="bi bi-geo-alt"></i></span>';
+    const href = `/hotels/?destination=${encodeURIComponent(destination.city)}`;
+    return `<a class="destination-card reveal-on-scroll" href="${href}" style="--reveal-delay:${index * 85}ms" aria-label="Explore hotels in ${escapeHtml(destination.city)}"><span class="destination-card__media">${image}</span><span class="destination-card__content"><span class="destination-card__eyebrow">Explore destination</span><strong>${escapeHtml(destination.city)}</strong><span>${escapeHtml(destination.country)} · ${destination.count} ${destination.count === 1 ? 'hotel' : 'hotels'} <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span></span></a>`;
+  }).join('');
+  revealVisibleSections();
+}
+
+let revealObserver;
+function revealVisibleSections() {
+  const elements = [...document.querySelectorAll('.reveal-on-scroll:not(.is-revealed)')];
+  if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    elements.forEach((element) => element.classList.add('is-revealed'));
+    return;
+  }
+  if (!revealObserver) {
+    revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-revealed');
+        revealObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px 40px 0px' });
+  }
+  elements.forEach((element) => revealObserver.observe(element));
+}
+
 function currentSearch() {
   const form = document.querySelector('#home-search');
   return form ? serializeSearch(form) : { destination: '', check_in: '', check_out: '', guests: '2' };
@@ -82,12 +132,15 @@ function currentSearch() {
 async function loadFeaturedHotels() {
   const container = document.querySelector('#featured-hotels');
   container.innerHTML = renderLoadingSkeleton(3);
-  const { data, error } = await supabaseClient.from('hotels').select('id,name,city,country,hotel_images(id,storage_path,alt_text,position,is_cover),room_types(name,nightly_rate,currency,is_active)').eq('is_active', true).order('name').limit(3);
+  const { data, error } = await supabaseClient.from('hotels').select('id,name,city,country,hotel_images(id,storage_path,alt_text,position,is_cover),room_types(name,nightly_rate,currency,is_active)').eq('is_active', true).order('name');
   if (error) { container.innerHTML = renderEmptyState({ title: 'Featured stays are unavailable', message: 'We could not load active hotels right now. Try the search again shortly.' }); return; }
-  if (!data?.length) { container.innerHTML = renderEmptyState({ title: 'No featured stays yet', message: 'Active hotel listings will appear here when they are available.' }); return; }
-  container.innerHTML = `<div class="row g-4">${data.map((hotel) => renderHotelCard({ ...hotel, location: `${hotel.city}, ${hotel.country}`, image: getCoverImage(hotel), search: currentSearch() })).join('')}</div>`;
+  if (!data?.length) { container.innerHTML = renderEmptyState({ title: 'No featured stays yet', message: 'Active hotel listings will appear here when they are available.' }); renderDestinations([]); return; }
+  container.innerHTML = `<div class="row g-4">${data.slice(0, 3).map((hotel, index) => `<div class="col-md-6 col-xl-4"><div class="featured-hotel reveal-on-scroll" style="--reveal-delay:${index * 100}ms">${renderHotelCard({ ...hotel, location: `${hotel.city}, ${hotel.country}`, image: getCoverImage(hotel), search: currentSearch() })}</div></div>`).join('')}</div>`;
+  renderDestinations(data);
+  revealVisibleSections();
 }
 
-app.innerHTML = `${renderNavigation({ active: 'Home' })}<main class="home-page"><section class="hero-section"><div class="page-container"><div class="hero-copy"><span class="eyebrow">StayEasy hotel booking</span><h1>Find a stay that fits the way you travel.</h1><p class="hero-lead">Search active hotels, compare available room options, and reserve with clear dates and pricing. Pay at the hotel when you arrive.</p></div>${renderSearchForm()}${renderValueProps()}</div></section><section class="section featured-section" aria-labelledby="featured-title"><div class="page-container"><div class="section-heading"><span class="eyebrow">Explore the collection</span><h2 id="featured-title">Featured active hotels</h2><p class="text-secondary mb-0">A small selection of properties currently available in the catalog.</p></div><div id="featured-hotels">${renderLoadingSkeleton(3)}</div></div></section><section class="section booking-note"><div class="page-container"><div class="booking-note__inner"><div><span class="eyebrow">Simple from search to stay</span><h2 class="h3 mb-2">Reserve now, pay at the property.</h2><p class="mb-0 text-secondary">Choose your dates and guests, review the current quote, and complete your reservation. Payment is handled directly by the hotel; availability and booking details remain clear in your confirmation.</p></div><a class="btn btn-outline-primary" href="/hotels/">Browse all hotels</a></div></div></section></main>${renderFooter()}`;
+app.innerHTML = `${renderNavigation({ active: 'Home' })}<main class="home-page"><section class="hero-section"><div class="page-container"><div class="hero-copy"><span class="eyebrow">StayEasy hotel booking</span><h1>Find a stay that fits the way you travel.</h1><p class="hero-lead">Search active hotels, compare available room options, and reserve with clear dates and pricing. Pay at the hotel when you arrive.</p></div>${renderSearchForm()}${renderValueProps()}</div></section><section class="section featured-section" aria-labelledby="featured-title"><div class="page-container"><div class="section-heading"><span class="eyebrow">Explore the collection</span><h2 id="featured-title">Featured active hotels</h2><p class="text-secondary mb-0">A small selection of properties currently available in the catalog.</p></div><div id="featured-hotels">${renderLoadingSkeleton(3)}</div></div></section><section class="section destinations-section" aria-labelledby="destinations-title"><div class="page-container"><div class="section-heading reveal-on-scroll"><span class="eyebrow">Explore somewhere new</span><h2 id="destinations-title">Destinations worth discovering</h2><p class="text-secondary mb-0">Find your next getaway in places with stays available on StayEasy.</p></div><div class="destination-grid" id="featured-destinations"><p class="text-secondary">Loading destinations…</p></div></div></section><section class="section booking-note"><div class="page-container"><div class="booking-note__inner"><div><span class="eyebrow">Simple from search to stay</span><h2 class="h3 mb-2">Reserve now, pay at the property.</h2><p class="mb-0 text-secondary">Choose your dates and guests, review the current quote, and complete your reservation. Payment is handled directly by the hotel; availability and booking details remain clear in your confirmation.</p></div><a class="btn btn-outline-primary" href="/hotels/">Browse all hotels</a></div></div></section></main>${renderFooter()}`;
 attachSearch();
+revealVisibleSections();
 loadFeaturedHotels();
