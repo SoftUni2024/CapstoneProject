@@ -16,3 +16,48 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .image-admin-list { display:grid; gap:1rem; } .image-admin-card { display:grid; grid-template-columns:220px minmax(0,1fr); overflow:hidden; border:1px solid var(--color-border); border-radius:var(--radius-lg); background:var(--color-surface); box-shadow:var(--shadow-sm); } .image-admin-card > img { width:100%; height:100%; min-height:190px; object-fit:cover; } .image-admin-card__body { padding:1.25rem; } .image-preview { min-height:180px; display:grid; place-items:center; overflow:hidden; border:1px dashed var(--color-border); border-radius:var(--radius-md); color:var(--color-muted); } .image-preview img { width:100%; max-height:260px; object-fit:contain; }
 .site-footer { border-top:1px solid var(--color-border); background:var(--color-surface); } .footer-link { color:var(--color-muted); text-decoration:none; } .footer-link:hover { color:var(--color-brand-dark); text-decoration:underline; } .state-card { padding:var(--space-7); text-align:center; } .state-card i { color:var(--color-brand); font-size:2rem; } .toast-container { z-index:1080; } .toast { border:1px solid var(--color-border); box-shadow:var(--shadow-md); } .dialog-backdrop { position:fixed; inset:0; z-index:1050; display:grid; place-items:center; padding:var(--space-4); background:rgb(15 23 42 / 55%); } .dialog { width:min(100%,480px); border:0; border-radius:var(--radius-lg); box-shadow:var(--shadow-md); }
 @media (max-width:991.98px) { .detail-overview { grid-template-columns:1fr; } .room-type-card { grid-template-columns:1fr 220px; } .room-type-card__action { text-align:left; } .booking-grid,.booking-detail-grid { grid-template-columns:1fr; } .booking-form-card { position:static; } .admin-card-grid { grid-template-columns:1fr 1fr; } } @media (max-width:767.98px) { .booking-note__inner { align-items:flex-start; flex-direction:column; } .auth-card { grid-template-columns:1fr; } .auth-card__intro { padding-bottom:2rem; } .detail-header { flex-direction:column; } .detail-gallery { grid-template-columns:repeat(2,1fr); } .detail-gallery__item:first-child { grid-column:span 2; grid-row:span 1; } .room-type-card { grid-template-columns:1fr; } .booking-list-card { grid-template-columns:1fr; } .booking-list-card__image,.booking-list-card__image img,.booking-image-fallback { min-height:180px; } .admin-card-grid { grid-template-columns:1fr; } .admin-list-card { align-items:flex-start; flex-direction:column; } } @media (max-width:575.98px) { .section { padding-block:var(--space-6); } .page-container { width:min(100% - 1.25rem,1180px); } .detail-overview { padding:1rem; } .detail-gallery { gap:.6rem; } .detail-gallery__item,.detail-gallery__image { min-height:140px; } } @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; transition-duration:.01s!important; animation-duration:.01s!important; animation-iteration-count:1!important; } }
+
+
+/* Home landing hero: scenic hotel photography with a readable cinematic overlay.
+   Replace this URL with a locally hosted /images/home-hero.jpg at any time. */
+.home-page .hero-section {
+  position: relative;
+  isolation: isolate;
+  min-height: min(760px, 92vh);
+  display: flex;
+  align-items: center;
+  padding-block: clamp(4rem, 8vw, 7rem);
+  background-color: #163b46;
+  background-image:
+    linear-gradient(90deg, rgba(9, 33, 42, .83) 0%, rgba(9, 33, 42, .60) 47%, rgba(9, 33, 42, .30) 100%),
+    url('https://images.unsplash.com/photo-1561501900-3701fa6a0864?auto=format&fit=crop&w=2000&q=82');
+  background-size: cover;
+  background-position: center 52%;
+  background-repeat: no-repeat;
+}
+.home-page .hero-section .page-container { width: min(100% - 2rem, 1180px); }
+.home-page .hero-copy { max-width: 800px; }
+.home-page .hero-copy h1 {
+  color: #fff;
+  text-shadow: 0 3px 20px rgba(0, 0, 0, .17);
+}
+.home-page .hero-copy .eyebrow { color: #f4d4a4; }
+.home-page .hero-lead { color: rgba(255, 255, 255, .91); }
+.home-page .hero-section .value-point {
+  background: rgba(255, 255, 255, .94);
+  box-shadow: 0 12px 28px rgba(7, 26, 35, .12);
+}
+.home-page .hero-section .search-panel {
+  background: rgba(255, 255, 255, .97);
+  box-shadow: 0 24px 60px rgba(5, 23, 33, .22);
+}
+@media (max-width: 767.98px) {
+  .home-page .hero-section {
+    min-height: auto;
+    background-position: 62% center;
+    background-image:
+      linear-gradient(180deg, rgba(9, 33, 42, .87) 0%, rgba(9, 33, 42, .68) 58%, rgba(9, 33, 42, .61) 100%),
+      url('https://images.unsplash.com/photo-1561501900-3701fa6a0864?auto=format&fit=crop&w=1200&q=80');
+  }
+  .home-page .hero-section .page-container { width: min(100% - 1.25rem, 1180px); }
+}
