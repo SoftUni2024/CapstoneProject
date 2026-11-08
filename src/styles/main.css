@@ -61,3 +61,70 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
   }
   .home-page .hero-section .page-container { width: min(100% - 1.25rem, 1180px); }
 }
+
+
+/* Home page: richer hotel cards, live destination discovery, and gentle motion. */
+.home-page .featured-section { background: #f8fafb; }
+.home-page .featured-section .section-heading,
+.home-page .destinations-section .section-heading { max-width: 760px; }
+.home-page .featured-hotel { height: 100%; }
+.home-page .featured-hotel .hotel-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(23, 107, 135, .10);
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(19, 54, 70, .09);
+  transition: transform 280ms ease, box-shadow 280ms ease, border-color 280ms ease;
+}
+.home-page .featured-hotel .hotel-card__media { overflow: hidden; min-height: 240px; }
+.home-page .featured-hotel .hotel-card__media img { height: 240px; transition: transform 500ms ease; }
+.home-page .featured-hotel .hotel-card__body { display: flex; flex: 1; flex-direction: column; padding: 1.6rem; }
+.home-page .featured-hotel .hotel-card__title { font-size: 1.4rem; line-height: 1.23; }
+.home-page .featured-hotel .price { margin-top: auto; }
+.home-page .featured-hotel .hotel-card .btn { align-self: flex-start; }
+.home-page .destinations-section { background: linear-gradient(180deg, #f8fafb 0%, #edf5f6 100%); }
+.home-page .destination-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
+.home-page .destination-card {
+  position: relative;
+  display: block;
+  min-height: 320px;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  background: #17556a;
+  color: #fff;
+  box-shadow: 0 16px 40px rgba(9, 38, 50, .13);
+  text-decoration: none;
+  isolation: isolate;
+  transition: transform 280ms ease, box-shadow 280ms ease;
+}
+.home-page .destination-card__media,
+.home-page .destination-card__media::after { position: absolute; inset: 0; }
+.home-page .destination-card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 550ms ease; }
+.home-page .destination-card__media::after {
+  content: "";
+  background: linear-gradient(180deg, rgba(10, 30, 40, .06) 8%, rgba(6, 26, 37, .85) 100%);
+}
+.home-page .destination-card__fallback { display: grid; place-items: center; height: 100%; font-size: 4rem; color: rgba(255, 255, 255, .3); }
+.home-page .destination-card__content { position: absolute; inset: auto 1.5rem 1.5rem; display: grid; gap: .3rem; z-index: 1; }
+.home-page .destination-card__eyebrow { color: #f0d09e; text-transform: uppercase; font-size: .68rem; font-weight: 800; letter-spacing: .14em; }
+.home-page .destination-card__content strong { font-family: var(--font-display); font-size: clamp(1.6rem, 2.6vw, 2.2rem); line-height: 1.1; }
+.home-page .destination-card__content > span:last-child { color: rgba(255, 255, 255, .88); font-size: .88rem; }
+.home-page .destination-card__content i { margin-left: .35rem; }
+@media (hover:hover) {
+  .home-page .featured-hotel .hotel-card:hover { transform: translateY(-7px); box-shadow: 0 22px 44px rgba(19, 54, 70, .17); border-color: rgba(23, 107, 135, .25); }
+  .home-page .featured-hotel .hotel-card:hover img { transform: scale(1.055); }
+  .home-page .destination-card:hover { color: #fff; transform: translateY(-6px); box-shadow: 0 23px 48px rgba(9, 38, 50, .2); }
+  .home-page .destination-card:hover img { transform: scale(1.07); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .home-page .reveal-on-scroll { animation: homeFadeIn 650ms both; animation-delay: var(--reveal-delay, 0ms); }
+  @keyframes homeFadeIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+}
+@media (max-width: 991.98px) { .home-page .destination-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 575.98px) {
+  .home-page .destination-grid { grid-template-columns: 1fr; }
+  .home-page .destination-card { min-height: 260px; }
+  .home-page .featured-hotel .hotel-card__media,
+  .home-page .featured-hotel .hotel-card__media img { min-height: 215px; height: 215px; }
+}
